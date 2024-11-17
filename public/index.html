@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GN Oil Cake Analysis</title>
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-vial"></i> GN Oil Cake Analysis</h1>
+        </header>
+
+        <section class="main-section">
+            <div class="left-panel">
+                <div class="sample-input">
+                    <label for="sampleName"><i class="fas fa-tag"></i> Sample Name:</label>
+                    <input type="text" id="sampleName" placeholder="Enter Sample Name" required>
+                </div>
+                <div class="last-samples">
+                    <h2>Last 2 Sample Names</h2>
+                    <div id="sampleContainer"></div>
+                </div>                
+            </div>
+
+            <div class="image-section">
+                <div class="upload-section">
+                    <!-- File upload section with icons -->
+                    <label for="fileInput" class="icon-button">
+                        <i class="fas fa-file-upload"></i>
+                    </label>
+                    <input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)" style="display: none;">
+
+                    <label for="cameraInput" class="icon-button">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" accept="image/*" capture="environment" id="cameraInput" onchange="previewImage(event)" style="display: none;">
+                
+                    <button id="uploadButton" class="choose-btn" onclick="uploadImage()">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload
+                    </button>
+                </div>
+
+                <div class="image-display">
+                    <h2><i class="fas fa-image"></i> Uploaded Image</h2>
+                    <img id="imagePreview" alt="Image Preview">
+                </div>
+
+                <div id="loadingSpinner" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Uploading...
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="chart-container">
+                    <h3><i class="fas fa-chart-pie"></i> Analysis Chart</h3>
+                    <canvas id="analysisChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <div class="analysis-report">
+            <div class="analysis-details">
+                <h2><i class="fas fa-file-medical"></i> Analysis Report</h2>
+                <p><i class="fas fa-oil-can"></i> Oil: <span id="oil"></span></p>
+                <p><i class="fas fa-dumbbell"></i> Protein: <span id="protein"></span></p>
+                <p><i class="fas fa-flask"></i> FFA: <span id="ffa"></span></p>
+            </div>
+            <div class="download-section">
+                <button class="download-btn" onclick="downloadReport()">
+                    <i class="fas fa-file-download"></i> Download Report
+                </button>
+            </div>                
+        </div> 
+
+        <div class="accuracy-container">
+            <label for="accuracy-bar"><i class="fas fa-chart-line"></i> Model Accuracy: <span id="accuracy-percentage"></span></label>
+            <progress id="accuracy-bar" value="0" max="100"></progress>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

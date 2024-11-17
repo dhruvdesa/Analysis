@@ -1,0 +1,309 @@
+/* General Layout */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f0f4f8, #dfe9f3);
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 5px;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    color: #2b3e50;
+}
+
+/* Main Section Layout */
+.main-section {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Panels */
+.left-panel, .right-panel, .image-section {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    flex: 1;
+}
+
+/* Sample Input */
+.sample-input label {
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.sample-input input[type="text"] {
+    width: 90%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    margin-top: 5px;
+}
+
+/* Last Samples */
+.last-samples h2 {
+    font-size: 1.2rem;
+    color: #2b3e50;
+    margin-top: 10px;
+}
+
+#sample-list {
+    list-style: none;
+    padding: 0;
+}
+
+#sample-list li {
+    padding: 10px;
+    background: #f7f9fc;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+/* Upload Section */
+.upload-section {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.icon-button {
+    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.icon-button:hover {
+    background: linear-gradient(135deg, #feb47b, #ff7e5f);
+    transform: scale(1.05);
+}
+
+.choose-btn {
+    background: #2b3e50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.choose-btn:hover {
+    background: #3d5971;
+}
+
+/* Image Display Section */
+.image-display {
+    text-align: center;
+}
+
+.image-display h2 {
+    font-size: 1.2rem;
+    color: #2b3e50;
+}
+
+#imagePreview {
+    max-width: 100%;
+    height: 300px; /* Set desired height here */
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Loading Spinner */
+#loadingSpinner {
+    color: #555;
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Chart Container */
+.chart-container {
+    background-color: #f0f4f8;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    height: 500px;
+}
+
+.chart-container h3 {
+    color: #2b3e50;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+/* Analysis Report and Accuracy Bar */
+.analysis-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 20px; /* Add spacing above the section */
+}
+
+.analysis-report {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    flex: 1; /* Allow the report to take up available space */
+}
+
+.analysis-details h2 {
+    font-size: 1.2rem;
+    color: #2b3e50;
+}
+
+.analysis-details p {
+    font-size: 1rem;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    color: #555;
+}
+
+.analysis-details i {
+    color: #5f7c9d;
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+/* Download Button */
+.download-btn {
+    background: #2b3e50;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.download-btn:hover {
+    background: #3d5971;
+}
+
+/* Accuracy Bar */
+.accuracy-container {
+    flex: 1; /* Allow the accuracy bar to take up available space */
+    text-align: center;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.accuracy-container label {
+    font-size: 1.1rem;
+    color: #555;
+}
+
+#accuracy-bar {
+    width: 100%;
+    height: 20px;
+    border-radius: 5px;
+    background: #e0e0e0;
+    margin-top: 10px; /* Add space above the progress bar */
+}
+
+#accuracy-bar::-webkit-progress-value {
+    background: linear-gradient(135deg, #56ab2f, #a8e063);
+    transition: width 0.4s ease-in-out;
+}
+
+#accuracy-bar::-moz-progress-bar {
+    background: linear-gradient(135deg, #56ab2f, #a8e063);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .main-section {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .icon-button, .choose-btn, .download-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    .analysis-section {
+        flex-direction: column; /* Stack on smaller screens */
+    }
+
+    .analysis-report, .accuracy-container {
+        margin-right: 0; /* Remove margin when stacked */
+        margin-bottom: 10px; /* Add spacing between stacked elements */
+    }
+
+    #accuracy-bar {
+        height: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+    }
+
+    .sample-input input[type="text"] {
+        width: 90%;
+        font-size: 0.9rem;
+    }
+
+    #sample-list li {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+
+    .icon-button, .choose-btn, .download-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .chart-container, .analysis-report {
+        padding: 15px;
+    }
+
+    .accuracy-container label {
+        font-size: 0.9rem;
+    }
+
+    #accuracy-bar {
+        height: 10px;
+    }
+}
