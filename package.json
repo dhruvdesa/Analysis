@@ -21,8 +21,16 @@
   "main": "server.js",
   "author": "dhruv",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "nodemon": "^3.1.7"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhruvdesa/Analysis.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhruvdesa/Analysis/issues"
+  },
+  "homepage": "https://github.com/dhruvdesa/Analysis#readme",
+  "description": ""
 }
