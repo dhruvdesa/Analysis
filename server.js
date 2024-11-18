@@ -142,7 +142,7 @@ app.get('/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
-                 LIMIT 5`;
+                 LIMIT 2`;
 
     pool.query(sql, (error, results) => {
         if (error) {
