@@ -4,16 +4,19 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const mysql = require('mysql2');
+const dotenv = require('dotenv');
 const { analyzeImage } = require('./ml-model'); // Ensure this import path is correct
 
-const IP_ADDRESS = '192.168.1.226'; // Replace with your correct IP address
+dotenv.config(); // Load environment variables
 
 // Set up Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+const IP_ADDRESS = process.env.IP_ADDRESS || '192.168.1.226'; // Replace with your correct IP address
 
 // Middleware
 app.use(cors());
+app.use(express.json());
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
 
@@ -69,56 +72,52 @@ app.get('/', (req, res) => {
 });
 
 // Handle image upload
-app.post('/upload', upload.single('image'), async (req, res) => {
-    const { sampleName } = req.body; // Get sample name from the form
+app.post('/upload', (req, res) => {
+    upload.single('image')(req, res, async (err) => {
+        if (err instanceof multer.MulterError) {
+            return res.status(400).json({ error: `Multer Error: ${err.message}` });
+        } else if (err) {
+            return res.status(400).json({ error: `File Upload Error: ${err.message}` });
+        }
 
-    // Check if file and sampleName are provided
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
-    }
+        const { sampleName } = req.body;
+        if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+        if (!sampleName) return res.status(400).json({ error: 'Sample name is required.' });
 
-    if (!sampleName) {
-        return res.status(400).send('Sample name is required.');
-    }
+        try {
+            const analysisResults = await analyzeImage(req.file.path);
 
-    try {
-        // Analyze the uploaded image using the ML model
-        const analysisResults = await analyzeImage(req.file.path); // Correct path
-
-        // Log the analysis results for debugging
-        console.log('Analysis Results:', analysisResults);
-
-        // SQL query to insert the sample name and analysis results into the database
-        const sql = `INSERT INTO scans (sample_name, image_name, oil, protein, ffa) 
-                     VALUES (?, ?, ?, ?, ?)`;
-
-        const values = [
-            sampleName, // Insert sample name
-            req.file.originalname, // Original file name
-            parseFloat(analysisResults.oil) || null,
-            parseFloat(analysisResults.protein) || null,
-            parseFloat(analysisResults.ffa) || null
-        ];
-
-        // Use the connection pool to execute the query
-        pool.query(sql, values, (error, results) => {
-            if (error) {
-                console.error('Database error:', error.message);
-                return res.status(500).json({ error: 'Failed to save data to the database.' });
+            if (!analysisResults || Object.keys(analysisResults).length === 0) {
+                throw new Error('Analysis returned empty results.');
             }
-            console.log('Data saved to the database.');
 
-            // Send back the analysis results along with a success message
-            res.json({
-                message: 'Analysis complete and data saved successfully.',
-                results: analysisResults,
-                accuracy: calculateAccuracy(analysisResults), // Example accuracy calculation
+            const sql = `INSERT INTO scans (sample_name, image_name, oil, protein, ffa, upload_date) 
+                         VALUES (?, ?, ?, ?, ?, NOW())`;
+            const values = [
+                sampleName,
+                req.file.filename,
+                parseFloat(analysisResults.oil) || null,
+                parseFloat(analysisResults.protein) || null,
+                parseFloat(analysisResults.ffa) || null,
+            ];
+
+            pool.query(sql, values, (dbErr) => {
+                if (dbErr) {
+                    console.error('Database Error:', dbErr.message);
+                    return res.status(500).json({ error: 'Failed to save data to the database.' });
+                }
+
+                res.json({
+                    message: 'Analysis complete and data saved successfully.',
+                    results: analysisResults,
+                    accuracy: calculateAccuracy(analysisResults),
+                });
             });
-        });
-    } catch (error) {
-        console.error('Error during analysis or saving data:', error.message);
-        res.status(500).json({ error: 'Failed to analyze the image or save data.' });
-    }
+        } catch (analysisError) {
+            console.error('Analysis Error:', analysisError.message);
+            res.status(500).json({ error: `Analysis failed: ${analysisError.message}` });
+        }
+    });
 });
 
 // Function to calculate accuracy (implement your own logic)
@@ -128,24 +127,23 @@ function calculateAccuracy(analysisResults) {
     return (accuracy * 100).toFixed(2) + '%'; // Return formatted accuracy
 }
 
-// Fetch last 5 samples from the database
+// Fetch the last 5 samples
 app.get('/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
-                 LIMIT 2`;  // Change to fetch last 5 samples
+                 LIMIT 5`;
 
     pool.query(sql, (error, results) => {
         if (error) {
-            console.error('Error fetching last 2 samples:', error.message);
-            return res.status(500).json({ error: 'Failed to fetch last samples from the database.' });
+            console.error('Error fetching samples:', error.message);
+            return res.status(500).json({ error: 'Failed to fetch last samples.' });
         }
-        res.json(results); // Send the results as JSON
+        res.json(results);
     });
 });
 
 // Start the server
-app.listen(PORT, IP_ADDRESS, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    console.log(`Server is running on http://${IP_ADDRESS}:${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Server running on http://${IP_ADDRESS}:${PORT}`);
 });
