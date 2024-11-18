@@ -4789,5 +4789,246 @@
       0.45,
       0.55
     ]
+  },
+  {
+    "timestamp": "2024-11-18T11:57:56.381Z",
+    "errors": [
+      {
+        "oilError": -0.8399999999999999,
+        "proteinError": -8.139999999999993,
+        "ffaError": 5.38
+      },
+      {
+        "oilError": -1.0199999999999996,
+        "proteinError": -9.689999999999998,
+        "ffaError": 6.03
+      },
+      {
+        "oilError": 0,
+        "proteinError": -4.699999999999996,
+        "ffaError": 8.790000000000001
+      },
+      {
+        "oilError": -0.7399999999999993,
+        "proteinError": -6.649999999999999,
+        "ffaError": 6.970000000000001
+      },
+      {
+        "oilError": -0.46999999999999975,
+        "proteinError": -3.8499999999999943,
+        "ffaError": 5.180000000000001
+      },
+      {
+        "oilError": -0.9799999999999995,
+        "proteinError": -3.8399999999999963,
+        "ffaError": 3.1500000000000004
+      },
+      {
+        "oilError": -1.3199999999999994,
+        "proteinError": -1.3399999999999963,
+        "ffaError": 16.569999999999997
+      },
+      {
+        "oilError": 0.009999999999999787,
+        "proteinError": -3.489999999999995,
+        "ffaError": 9.13
+      },
+      {
+        "oilError": -2.1099999999999994,
+        "proteinError": -0.0899999999999963,
+        "ffaError": 7.220000000000001
+      },
+      {
+        "oilError": -0.8399999999999999,
+        "proteinError": -5.539999999999999,
+        "ffaError": 1.09
+      },
+      {
+        "oilError": -1.459999999999999,
+        "proteinError": -6.8899999999999935,
+        "ffaError": 9.52
+      },
+      {
+        "oilError": -0.8399999999999999,
+        "proteinError": -8.139999999999993,
+        "ffaError": 5.470000000000001
+      },
+      {
+        "oilError": -0.7399999999999993,
+        "proteinError": -6.649999999999999,
+        "ffaError": 6.970000000000001
+      },
+      {
+        "oilError": -1.3199999999999994,
+        "proteinError": -1.3399999999999963,
+        "ffaError": 16.569999999999997
+      },
+      {
+        "oilError": -1.4999999999999991,
+        "proteinError": -2.059999999999995,
+        "ffaError": 11.34
+      },
+      {
+        "oilError": -1.2199999999999998,
+        "proteinError": -5.019999999999996,
+        "ffaError": 2.4400000000000004
+      },
+      {
+        "oilError": -1.5099999999999998,
+        "proteinError": -1.009999999999998,
+        "ffaError": 11.35
+      },
+      {
+        "oilError": -1.2499999999999991,
+        "proteinError": -4.709999999999994,
+        "ffaError": 2.0300000000000002
+      },
+      {
+        "oilError": -0.9799999999999995,
+        "proteinError": -1.759999999999998,
+        "ffaError": 8.44
+      },
+      {
+        "oilError": -1.5899999999999999,
+        "proteinError": -1.3499999999999943,
+        "ffaError": 9.72
+      },
+      {
+        "oilError": 0.9299999999999997,
+        "proteinError": -9.269999999999996,
+        "ffaError": 26.119999999999997
+      },
+      {
+        "oilError": -0.049999999999998934,
+        "proteinError": -6.289999999999999,
+        "ffaError": 4.53
+      },
+      {
+        "oilError": -1.7399999999999993,
+        "proteinError": -0.4399999999999977,
+        "ffaError": 18.61
+      },
+      {
+        "oilError": -1.5599999999999996,
+        "proteinError": -2.3899999999999935,
+        "ffaError": 2.59
+      },
+      {
+        "oilError": -1.3499999999999996,
+        "proteinError": -4.479999999999997,
+        "ffaError": 8.5
+      },
+      {
+        "oilError": -0.6899999999999995,
+        "proteinError": -4.839999999999996,
+        "ffaError": 6.91
+      },
+      {
+        "oilError": -1.6499999999999995,
+        "proteinError": -2.6299999999999955,
+        "ffaError": 16.54
+      },
+      {
+        "oilError": -1.3699999999999992,
+        "proteinError": -6.909999999999997,
+        "ffaError": 2.5
+      },
+      {
+        "oilError": -2.01,
+        "proteinError": 0.25,
+        "ffaError": 4.720000000000001
+      },
+      {
+        "oilError": -0.7099999999999991,
+        "proteinError": -4.779999999999994,
+        "ffaError": 21.83
+      },
+      {
+        "oilError": -0.23999999999999932,
+        "proteinError": -6.659999999999997,
+        "ffaError": 2.0700000000000003
+      },
+      {
+        "oilError": -1.129999999999999,
+        "proteinError": -0.259999999999998,
+        "ffaError": 16.11
+      },
+      {
+        "oilError": 1.7200000000000006,
+        "proteinError": -8.809999999999995,
+        "ffaError": 15.72
+      },
+      {
+        "oilError": -0.7599999999999998,
+        "proteinError": -3.8999999999999986,
+        "ffaError": 14.09
+      },
+      {
+        "oilError": -1.3899999999999997,
+        "proteinError": -3.3999999999999986,
+        "ffaError": 5.96
+      },
+      {
+        "oilError": -2.1799999999999997,
+        "proteinError": 7.1200000000000045,
+        "ffaError": 1.45
+      },
+      {
+        "oilError": -2.0699999999999994,
+        "proteinError": 6.43,
+        "ffaError": 1.41
+      },
+      {
+        "oilError": -0.4899999999999993,
+        "proteinError": -2.0899999999999963,
+        "ffaError": 9.77
+      },
+      {
+        "oilError": -2.0699999999999994,
+        "proteinError": 5.3700000000000045,
+        "ffaError": 2.37
+      },
+      {
+        "oilError": -1.709999999999999,
+        "proteinError": 6.310000000000002,
+        "ffaError": 1.76
+      },
+      {
+        "oilError": -0.21999999999999975,
+        "proteinError": -8.719999999999999,
+        "ffaError": 38.82
+      },
+      {
+        "oilError": -0.7899999999999991,
+        "proteinError": -8.79,
+        "ffaError": 3.0599999999999996
+      },
+      {
+        "oilError": -2.289999999999999,
+        "proteinError": 0.28000000000000114,
+        "ffaError": 6.96
+      },
+      {
+        "oilError": 0.040000000000000924,
+        "proteinError": 0.5200000000000031,
+        "ffaError": 0.9099999999999999
+      },
+      {
+        "oilError": -1.2499999999999991,
+        "proteinError": -1.3200000000000003,
+        "ffaError": 33.31
+      },
+      {
+        "oilError": -1.9799999999999995,
+        "proteinError": 5.3700000000000045,
+        "ffaError": 2.3200000000000003
+      }
+    ],
+    "adjustedCoefficients": [
+      0.15,
+      0.25,
+      0.45,
+      0.55
+    ]
   }
 ]
