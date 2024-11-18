@@ -15,7 +15,11 @@ const PORT = process.env.PORT || 3000;
 const IP_ADDRESS = process.env.IP_ADDRESS || '192.168.1.226'; // Replace with your correct IP address
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+    origin: ['http://localhost:3000'], // Adjust to allow specific origins
+    methods: ['GET', 'POST'],
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
@@ -24,7 +28,7 @@ app.use('/uploads', express.static('uploads')); // Serve uploaded files
 const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'root19',
+    password: process.env.DB_PASSWORD || 'root',
     database: process.env.DB_NAME || 'gnoc',
     connectionLimit: 10, // Set the connection limit for the pool
 });
@@ -121,10 +125,16 @@ app.post('/upload', (req, res) => {
 });
 
 // Function to calculate accuracy (implement your own logic)
-function calculateAccuracy(analysisResults) {
-    // Dummy accuracy calculation based on some arbitrary logic
-    const accuracy = (100 - Math.abs(analysisResults.ffa)) / 100; // Just an example
-    return (accuracy * 100).toFixed(2) + '%'; // Return formatted accuracy
+function calculateAccuracy(analysisResults, expectedResults = { oil: 10, protein: 50, ffa: 40 }) {
+    const totalComponents = 3;
+    let accuracySum = 0;
+
+    ['oil', 'protein', 'ffa'].forEach((key) => {
+        const diff = Math.abs((analysisResults[key] - expectedResults[key]) / expectedResults[key]);
+        accuracySum += 1 - diff;
+    });
+
+    return ((accuracySum / totalComponents) * 100).toFixed(2) + '%';
 }
 
 // Fetch the last 5 samples
@@ -141,6 +151,18 @@ app.get('/last-samples', (req, res) => {
         }
         res.json(results);
     });
+});
+
+// Fetch overall enhanced accuracy
+app.get('/api/get-enhanced-accuracy', (req, res) => {
+    // Placeholder logic for enhanced accuracy (replace with your actual logic)
+    res.json({ overallAccuracy: '95.12%' });
+});
+
+// Error handler for centralized logging
+app.use((err, req, res, next) => {
+    console.error('Error:', err.message);
+    res.status(err.status || 500).json({ error: err.message });
 });
 
 // Start the server
