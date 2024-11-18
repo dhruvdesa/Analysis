@@ -1,233 +1,154 @@
-// Global variable to hold the chart instance
-let analysisChart; 
-// Variable to hold the interval for fetching accuracy metrics
-let accuracyInterval;
-let previousAccuracy = 0; // Track previous accuracy to detect improvements 
+// Global variables
+let analysisChart; // To hold the Chart.js instance
+let accuracyInterval; // Interval for fetching accuracy updates
+let previousAccuracy = 0; // Track previous accuracy for improvements
 
+// DOM elements
 const accuracyPercentage = document.getElementById('accuracy-percentage');
 const accuracyBar = document.getElementById('accuracy-bar');
+const fileInput = document.getElementById('fileInput');
+const cameraInput = document.getElementById('cameraInput');
+const sampleNameInput = document.getElementById('sampleName');
+const uploadButton = document.getElementById('uploadButton');
+const loadingSpinner = document.getElementById('loadingSpinner');
 
-// Function to update accuracy meter dynamically with Overall Enhanced Accuracy
+// Helper function: Update accuracy meter
 function updateAccuracyMeter(accuracy) {
-    // Check if accuracy is a valid number before updating
-    if (typeof accuracy === 'number' && !isNaN(accuracy) && accuracy >= 0 && accuracy <= 100) {
-        // Only update if the accuracy is higher than the previous value
+    if (typeof accuracy === 'number' && accuracy >= 0 && accuracy <= 100) {
         if (accuracy > previousAccuracy) {
             accuracyPercentage.textContent = `${accuracy.toFixed(2)}%`;
-            accuracyBar.value = accuracy; 
-            previousAccuracy = accuracy; // Update previous accuracy value
+            accuracyBar.value = accuracy;
+            previousAccuracy = accuracy;
         }
     } else {
-        console.error('Invalid accuracy value:', accuracy, typeof accuracy); 
-        accuracyPercentage.textContent = '0%'; 
-        accuracyBar.value = 0; 
-        
-        throw new Error(`Invalid accuracy value: ${accuracy}`);
+        console.error('Invalid accuracy value:', accuracy);
+        accuracyPercentage.textContent = '0%';
+        accuracyBar.value = 0;
     }
 }
 
-// Function to show initial accuracy when the page loads
-function displayInitialAccuracy() {
-    updateAccuracyMeter(previousAccuracy);
+// Helper function: Fetch and display initial accuracy
+async function fetchInitialAccuracy() {
+    try {
+        const response = await fetch('/api/get-enhanced-accuracy');
+        const data = await response.json();
+        if (data.accuracy) updateAccuracyMeter(data.accuracy);
+    } catch (error) {
+        console.error('Error fetching accuracy:', error);
+    }
 }
 
-document.addEventListener('DOMContentLoaded', displayInitialAccuracy);
-
-// Function to preview the image
+// Function: Preview selected image
 function previewImage(file) {
-    if (!(file instanceof File)) {
-        console.error('Invalid file type for previewing:', file);
+    if (file instanceof File) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imgElement = document.getElementById('imagePreview');
+            if (imgElement) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block';
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Function: Upload image and analyze
+async function uploadImage() {
+    let file = fileInput.files[0] || cameraInput.files[0];
+    const sampleName = sampleNameInput.value.trim();
+
+    if (!file || !sampleName) {
+        alert('Please select a valid image and enter a sample name.');
         return;
     }
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const imgElement = document.getElementById('imagePreview');
-        if (imgElement) { // Check if the image element exists
-            imgElement.src = e.target.result;
-            imgElement.style.display = 'block'; // Show the image element
-        } else {
-            console.error('Image preview element not found');
-        }
-    };
+    const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!acceptedFileTypes.includes(file.type)) {
+        alert('Invalid file type. Please upload a JPG, PNG, or GIF image.');
+        return;
+    }
 
-    reader.readAsDataURL(file); // Read the file only if it's valid
-}
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('sampleName', sampleName);
 
-// Example function to fetch Overall Enhanced Accuracy from backend
-async function fetchOverallEnhancedAccuracy() {
     try {
-        const response = await fetch('/api/get-enhanced-accuracy'); // Endpoint to fetch accuracy
-        const data = await response.json();
-        if (data && data.accuracy) {
-            updateAccuracyMeter(data.accuracy);
+        loadingSpinner.style.display = 'block';
+        uploadButton.disabled = true;
+
+        previewImage(file);
+
+        const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            const analysisResults = await response.json();
+            updateAnalysisResults(analysisResults.results);
+            renderChart(analysisResults.results, sampleName);
+            updateAccuracyMeter(parseFloat(analysisResults.accuracy));
         } else {
-            console.error('Accuracy data not found in response');
+            const errorData = await response.json();
+            alert(`Error: ${errorData.error || 'Image upload failed.'}`);
         }
     } catch (error) {
-        console.error('Error fetching enhanced accuracy:', error);
+        console.error('Error uploading image:', error);
+        alert('An error occurred while uploading the image.');
+    } finally {
+        loadingSpinner.style.display = 'none';
+        uploadButton.disabled = false;
     }
 }
 
-// Fetch accuracy on page load
-document.addEventListener('DOMContentLoaded', fetchOverallEnhancedAccuracy);
-
-// Function to upload the image
-async function uploadImage() {
-    const fileInput = document.getElementById('fileInput');
-    const cameraInput = document.getElementById('cameraInput');
-    const sampleName = document.getElementById('sampleName').value.trim(); // Get the sample name and trim whitespace
-    const uploadButton = document.getElementById('uploadButton'); // Define the button correctly
-
-    let file = null;
-
-    // Check if a file was selected from file input
-    if (fileInput.files.length > 0) {
-        file = fileInput.files[0];
-    } 
-    // If not, check if a file was captured from the camera input
-    else if (cameraInput.files.length > 0) {
-        file = cameraInput.files[0];
-    }
-
-    // Ensure the file is of the correct type before proceeding
-    const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/gif']; // Acceptable image types
-    if (file instanceof File && acceptedFileTypes.includes(file.type) && sampleName) {
-        const formData = new FormData();
-        formData.append('image', file); // Append the image file to the form data
-        formData.append('sampleName', sampleName); // Append the sample name
-
-        try {
-            // Show loading spinner and disable button while uploading
-            document.getElementById('loadingSpinner').style.display = 'block';
-            uploadButton.disabled = true; // Disable button only if it exists
-
-            // Load the selected/captured image for preview
-            previewImage(file); // Call preview image function
-
-            // Send the image file and sample name to the server
-            const response = await fetch('/upload', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.ok) {
-                const analysisResults = await response.json();
-                console.log('Analysis Results:', analysisResults.results); // Log the results for debugging
-
-                // Check if results structure is valid
-                if (analysisResults.results) {
-                    // Update the analysis results in the HTML
-                    updateAnalysisResults(analysisResults.results); // Make sure results have correct structure
-
-                    // Render the chart with the sample name
-                    renderChart(analysisResults.results, sampleName);
-
-                    // Update accuracy meter once after showing the report
-                    const accuracy = parseFloat(analysisResults.accuracy);
-                    updateAccuracyMeter(accuracy); // Update accuracy meter directly
-
-                    // No need to start accuracy update interval
-                } else {
-                    alert('Invalid results structure in the response.');
-                }
-            } else {
-                const errorData = await response.json();
-                alert(`Error: ${errorData.error || 'Error uploading image. Please try again.'}`);
-            }
-        } catch (error) {
-            console.error('Error occurred:', error); // Log error for debugging
-            alert('An error occurred: ' + error.message);
-        } finally {
-            // Hide loading spinner and enable button after upload
-            document.getElementById('loadingSpinner').style.display = 'none';
-            uploadButton.disabled = false; // Enable button only if it exists
-        }
-    } else {
-        alert("Please choose a valid image file (JPG, PNG, GIF) and enter a sample name.");
-    }
-}
-
-// Function to update the analysis results in the HTML
+// Function: Update analysis results in the UI
 function updateAnalysisResults(results) {
     const resultElements = {
         oil: document.getElementById('oil'),
         protein: document.getElementById('protein'),
-        ffa: document.getElementById('ffa')
+        ffa: document.getElementById('ffa'),
     };
-    Object.keys(resultElements).forEach(key => {
-        resultElements[key].textContent = formatResult(results[key]);
-    });
-}
 
-// Function to safely format results with percentage sign
-function formatResult(value) {
-    if (typeof value === 'number' && value) {
-        return `${value.toFixed(2)}%`;
-    } else if (typeof value === 'string' && value.includes('%')) {
-        return value; // Return the string value directly if it already contains a percentage sign
+    for (const key in resultElements) {
+        if (results[key]) {
+            resultElements[key].textContent = `${parseFloat(results[key]).toFixed(2)}%`;
+        }
     }
 }
 
-// Function to render the chart with analysis data
+// Function: Render chart with analysis data
 function renderChart(results, sampleName) {
     const ctx = document.getElementById('analysisChart').getContext('2d');
 
-    // Destroy the previous chart instance if it exists to avoid duplication
-    if (analysisChart) {
-        analysisChart.destroy();
-    }
+    if (analysisChart) analysisChart.destroy();
 
-    // Create the chart
     analysisChart = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: ['Oil', 'Protein', 'FFA'],
-            datasets: [{
-                label: 'Analysis Results',
-                data: [
-                    parseFloat(results.oil),
-                    parseFloat(results.protein), 
-                    parseFloat(results.ffa),
-                ],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)', 
-                    'rgba(54, 162, 235, 0.2)',  
-                    'rgba(255, 206, 86, 0.2)' 
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)'
-                ],
-                borderWidth: 1
-            }]
+            datasets: [
+                {
+                    label: 'Analysis Results',
+                    data: [results.oil, results.protein, results.ffa],
+                    backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                    borderWidth: 1,
+                },
+            ],
         },
         options: {
             plugins: {
                 title: {
                     display: true,
-                    text: `Analysis Results for ${sampleName}`
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: false,
-                    }
+                    text: `Analysis Results for ${sampleName}`,
                 },
-                x: {
-                    title: {
-                        display: false,
-                    }
-                }
-            }
-        }
+            },
+        },
     });
 }
 
-// Fetch last 5 samples
+// Function: Fetch and display last 5 samples
 async function fetchLastSamples() {
     try {
         const response = await fetch('/last-samples');
@@ -236,33 +157,25 @@ async function fetchLastSamples() {
         const sampleContainer = document.getElementById('sampleContainer');
         sampleContainer.innerHTML = '';
 
-        samples.forEach(sample => {
+        samples.forEach((sample) => {
             const sampleElement = document.createElement('div');
             sampleElement.classList.add('sample');
             sampleElement.innerHTML = `
                 <p><strong>Sample Name:</strong> ${sample.sample_name}</p>
-                <p><strong>Oil:</strong> ${sample.oil}</p>
-                <p><strong>Protein:</strong> ${sample.protein}</p>
-                <p><strong>FFA:</strong> ${sample.ffa}</p>
+                <p><strong>Oil:</strong> ${sample.oil}%</p>
+                <p><strong>Protein:</strong> ${sample.protein}%</p>
+                <p><strong>FFA:</strong> ${sample.ffa}%</p>
                 <p><strong>Date:</strong> ${new Date(sample.upload_date).toLocaleDateString()}</p>
             `;
             sampleContainer.appendChild(sampleElement);
         });
     } catch (error) {
-        displayErrorMessage('Error fetching last samples: ' + error.message);
+        console.error('Error fetching last samples:', error);
     }
 }
 
-// Initialize functions on page load
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    fetchInitialAccuracy();
     fetchLastSamples();
-    updateAccuracyMeter(previousAccuracy);
 });
-
-// Stop accuracy updates if needed
-function stopAccuracyUpdate() {
-    if (accuracyInterval) {
-        clearInterval(accuracyInterval);
-        accuracyInterval = null;
-    }
-}
