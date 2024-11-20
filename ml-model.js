@@ -53,12 +53,12 @@ async function performChemicalAnalysis(imagePath) {
 
 // Simulated calculation functions
 function calculateOilContent() { return (Math.random() * (10 - 8) + 8).toFixed(2); }
-function calculateProteinContent() { return (Math.random() * (48 - 40) + 40).toFixed(2); }
+function calculateProteinContent() { return (Math.random() * (60 - 40) + 40).toFixed(2); }
 function calculateFFAContent() { return (Math.random() * 50).toFixed(2); }
 
 // Validate analysis results
 function validateAnalysisResults(oil, protein, ffa) {
-    const maxOilGhani = 12, maxProtein = 48, maxFFA = 50;
+    const maxOilGhani = 12, maxProtein = 60, maxFFA = 50;
     if (parseFloat(oil) > maxOilGhani) throw new Error('Oil content exceeds maximum allowed limit.');
     if (parseFloat(protein) > maxProtein) throw new Error('Protein content exceeds maximum allowed limit.');
     if (parseFloat(ffa) > maxFFA) throw new Error('FFA content exceeds maximum allowed limit.');
