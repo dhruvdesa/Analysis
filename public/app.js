@@ -27,21 +27,12 @@ function updateAccuracyMeter(accuracy) {
     }
 }
 
+// Helper function: Fetch and display initial accuracy
 async function fetchInitialAccuracy() {
     try {
         const response = await fetch('/api/get-enhanced-accuracy');
-
-        if (!response.ok) {
-            console.error(`Error fetching accuracy: ${response.statusText}`);
-            throw new Error('Failed to fetch accuracy.');
-        }
-
         const data = await response.json();
-        if (data.accuracy) {
-            updateAccuracyMeter(data.accuracy);
-        } else {
-            console.error('Invalid accuracy response:', data);
-        }
+        if (data.accuracy) updateAccuracyMeter(data.accuracy);
     } catch (error) {
         console.error('Error fetching accuracy:', error);
     }
@@ -157,16 +148,12 @@ function renderChart(results, sampleName) {
     });
 }
 
+// Function: Fetch and display last 5 samples
 async function fetchLastSamples() {
     try {
         const response = await fetch('/last-samples');
-
-        if (!response.ok) {
-            console.error(`Error fetching last samples: ${response.statusText}`);
-            throw new Error('Failed to fetch last samples.');
-        }
-
         const samples = await response.json();
+
         const sampleContainer = document.getElementById('sampleContainer');
         sampleContainer.innerHTML = '';
 
