@@ -13,7 +13,7 @@ dotenv.config(); // Load environment variables
 const app = express();
 const PORT = process.env.PORT || 3000;
 // Update the IP_ADDRESS default to a safer option (localhost)
-const IP_ADDRESS = process.env.IP_ADDRESS || '127.0.0.1';
+const IP_ADDRESS = process.env.IP_ADDRESS || '192.168.1.226:3000';
 
 // Use dynamic allowed origins in CORS
 const corsOptions = {
