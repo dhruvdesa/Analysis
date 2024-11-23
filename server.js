@@ -4,24 +4,16 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const mysql = require('mysql2');
-const dotenv = require('dotenv');
 const { analyzeImage } = require('./ml-model'); // Ensure this import path is correct
 
-dotenv.config(); // Load environment variables
+const IP_ADDRESS = '192.168.1.226'; // Replace with your correct IP address
 
 // Set up Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
-// Update the IP_ADDRESS default to a safer option (localhost)
-const IP_ADDRESS = process.env.IP_ADDRESS || '192.168.1.226:3000';
 
-// Use dynamic allowed origins in CORS
-const corsOptions = {
-    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
-    methods: ['GET', 'POST'],
-};
-app.use(cors(corsOptions));
-app.use(express.json());
+// Middleware
+app.use(cors());
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
 
@@ -29,7 +21,7 @@ app.use('/uploads', express.static('uploads')); // Serve uploaded files
 const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'root',
+    password: process.env.DB_PASSWORD || 'root19',
     database: process.env.DB_NAME || 'gnoc',
     connectionLimit: 10, // Set the connection limit for the pool
 });
@@ -59,15 +51,13 @@ const storage = multer.diskStorage({
     },
 });
 
-// Error handling for invalid file type
+// File filter for validating uploaded files
 const fileFilter = (req, file, cb) => {
     const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (acceptedFileTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        const error = new Error('Invalid file type. Only JPG, PNG, and GIF are allowed.');
-        error.status = 400;
-        cb(error);
+        cb(new Error('Invalid file type. Only JPG, PNG, and GIF are allowed.'));
     }
 };
 
@@ -79,101 +69,83 @@ app.get('/', (req, res) => {
 });
 
 // Handle image upload
-app.post('/upload', (req, res) => {
-    upload.single('image')(req, res, async (err) => {
-        if (err instanceof multer.MulterError) {
-            return res.status(400).json({ error: `Multer Error: ${err.message}` });
-        } else if (err) {
-            return res.status(400).json({ error: `File Upload Error: ${err.message}` });
-        }
+app.post('/upload', upload.single('image'), async (req, res) => {
+    const { sampleName } = req.body; // Get sample name from the form
 
-        const { sampleName } = req.body;
-        if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
-        if (!sampleName) return res.status(400).json({ error: 'Sample name is required.' });
+    // Check if file and sampleName are provided
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+    }
 
-        try {
-            const analysisResults = await analyzeImage(req.file.path);
+    if (!sampleName) {
+        return res.status(400).send('Sample name is required.');
+    }
 
-            if (!analysisResults || Object.keys(analysisResults).length === 0) {
-                throw new Error('Analysis returned empty results.');
+    try {
+        // Analyze the uploaded image using the ML model
+        const analysisResults = await analyzeImage(req.file.path); // Correct path
+
+        // Log the analysis results for debugging
+        console.log('Analysis Results:', analysisResults);
+
+        // SQL query to insert the sample name and analysis results into the database
+        const sql = `INSERT INTO scans (sample_name, image_name, oil, protein, ffa) 
+                     VALUES (?, ?, ?, ?, ?)`;
+
+        const values = [
+            sampleName, // Insert sample name
+            req.file.originalname, // Original file name
+            parseFloat(analysisResults.oil) || null,
+            parseFloat(analysisResults.protein) || null,
+            parseFloat(analysisResults.ffa) || null
+        ];
+
+        // Use the connection pool to execute the query
+        pool.query(sql, values, (error, results) => {
+            if (error) {
+                console.error('Database error:', error.message);
+                return res.status(500).json({ error: 'Failed to save data to the database.' });
             }
+            console.log('Data saved to the database.');
 
-            const sql = `INSERT INTO scans (sample_name, image_name, oil, protein, ffa, upload_date) 
-                         VALUES (?, ?, ?, ?, ?, NOW())`;
-            const values = [
-                sampleName,
-                req.file.filename,
-                parseFloat(analysisResults.oil) || null,
-                parseFloat(analysisResults.protein) || null,
-                parseFloat(analysisResults.ffa) || null,
-            ];
-
-            pool.query(sql, values, (dbErr) => {
-                if (dbErr) {
-                    console.error('Database Error:', dbErr.message);
-                    return res.status(500).json({ error: 'Failed to save data to the database.' });
-                }
-
-                res.json({
-                    message: 'Analysis complete and data saved successfully.',
-                    results: analysisResults,
-                    accuracy: calculateAccuracy(analysisResults),
-                });
+            // Send back the analysis results along with a success message
+            res.json({
+                message: 'Analysis complete and data saved successfully.',
+                results: analysisResults,
+                accuracy: calculateAccuracy(analysisResults), // Example accuracy calculation
             });
-        } catch (analysisError) {
-            console.error('Analysis Error:', analysisError.message);
-            res.status(500).json({ error: `Analysis failed: ${analysisError.message}` });
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error during analysis or saving data:', error.message);
+        res.status(500).json({ error: 'Failed to analyze the image or save data.' });
+    }
 });
 
 // Function to calculate accuracy (implement your own logic)
-function calculateAccuracy(analysisResults, expectedResults = { oil: 10, protein: 50, ffa: 40 }) {
-    const totalComponents = 3;
-    let accuracySum = 0;
-
-    ['oil', 'protein', 'ffa'].forEach((key) => {
-        const diff = Math.abs((analysisResults[key] - expectedResults[key]) / expectedResults[key]);
-        accuracySum += 1 - diff;
-    });
-
-    return ((accuracySum / totalComponents) * 100).toFixed(2) + '%';
+function calculateAccuracy(analysisResults) {
+    // Dummy accuracy calculation based on some arbitrary logic
+    const accuracy = (100 - Math.abs(analysisResults.ffa)) / 100; // Just an example
+    return (accuracy * 100).toFixed(2) + '%'; // Return formatted accuracy
 }
 
-// Adjust the SQL query in `/last-samples` for clarity
+// Fetch last 5 samples from the database
 app.get('/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
-                 LIMIT 2`; // Change limit from 2 to 5
+                 LIMIT 2`;  // Change to fetch last 5 samples
+
     pool.query(sql, (error, results) => {
         if (error) {
-            console.error('Error fetching samples:', error.message);
-            return res.status(500).json({ error: 'Failed to fetch last samples.' });
+            console.error('Error fetching last 2 samples:', error.message);
+            return res.status(500).json({ error: 'Failed to fetch last samples from the database.' });
         }
-        res.json(results);
+        res.json(results); // Send the results as JSON
     });
 });
 
-// Use actual logic for enhanced accuracy in `/api/get-enhanced-accuracy`
-app.get('/api/get-enhanced-accuracy', async (req, res) => {
-    try {
-        const [results] = await pool.promise().query('SELECT AVG(oil) as avgOil, AVG(protein) as avgProtein, AVG(ffa) as avgFFA FROM scans');
-        const enhancedAccuracy = calculateEnhancedAccuracy(results[0]);
-        res.json({ overallAccuracy: `${enhancedAccuracy.toFixed(2)}%` });
-    } catch (error) {
-        console.error('Error calculating enhanced accuracy:', error.message);
-        res.status(500).json({ error: 'Failed to calculate enhanced accuracy.' });
-    }
-});
-
-// Improved error handling in global middleware
-app.use((err, req, res, next) => {
-    console.error('Error:', err.message);
-    res.status(err.status || 500).json({ error: err.message, stack: process.env.NODE_ENV === 'development' ? err.stack : undefined });
-});
-
 // Start the server
-app.listen(PORT, () => {
-    console.log(`Server running on http://${IP_ADDRESS}:${PORT}`);
+app.listen(PORT,IP_ADDRESS,() => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://${IP_ADDRESS}:${PORT}`);
 });
