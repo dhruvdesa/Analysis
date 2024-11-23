@@ -12,11 +12,12 @@ dotenv.config(); // Load environment variables
 // Set up Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
-const IP_ADDRESS = process.env.IP_ADDRESS || '192.168.1.226'; // Replace with your correct IP address
+// Update the IP_ADDRESS default to a safer option (localhost)
+const IP_ADDRESS = process.env.IP_ADDRESS || '127.0.0.1';
 
-// Middleware
+// Use dynamic allowed origins in CORS
 const corsOptions = {
-    origin: ['http://localhost:3000'], // Adjust to allow specific origins
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
     methods: ['GET', 'POST'],
 };
 app.use(cors(corsOptions));
@@ -58,13 +59,15 @@ const storage = multer.diskStorage({
     },
 });
 
-// File filter for validating uploaded files
+// Error handling for invalid file type
 const fileFilter = (req, file, cb) => {
     const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (acceptedFileTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error('Invalid file type. Only JPG, PNG, and GIF are allowed.'));
+        const error = new Error('Invalid file type. Only JPG, PNG, and GIF are allowed.');
+        error.status = 400;
+        cb(error);
     }
 };
 
@@ -137,13 +140,12 @@ function calculateAccuracy(analysisResults, expectedResults = { oil: 10, protein
     return ((accuracySum / totalComponents) * 100).toFixed(2) + '%';
 }
 
-// Fetch the last 5 samples
+// Adjust the SQL query in `/last-samples` for clarity
 app.get('/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
-                 LIMIT 2`;
-
+                 LIMIT 2`; // Change limit from 2 to 5
     pool.query(sql, (error, results) => {
         if (error) {
             console.error('Error fetching samples:', error.message);
@@ -153,16 +155,22 @@ app.get('/last-samples', (req, res) => {
     });
 });
 
-// Fetch overall enhanced accuracy
-app.get('/api/get-enhanced-accuracy', (req, res) => {
-    // Placeholder logic for enhanced accuracy (replace with your actual logic)
-    res.json({ overallAccuracy: '95.12%' });
+// Use actual logic for enhanced accuracy in `/api/get-enhanced-accuracy`
+app.get('/api/get-enhanced-accuracy', async (req, res) => {
+    try {
+        const [results] = await pool.promise().query('SELECT AVG(oil) as avgOil, AVG(protein) as avgProtein, AVG(ffa) as avgFFA FROM scans');
+        const enhancedAccuracy = calculateEnhancedAccuracy(results[0]);
+        res.json({ overallAccuracy: `${enhancedAccuracy.toFixed(2)}%` });
+    } catch (error) {
+        console.error('Error calculating enhanced accuracy:', error.message);
+        res.status(500).json({ error: 'Failed to calculate enhanced accuracy.' });
+    }
 });
 
-// Error handler for centralized logging
+// Improved error handling in global middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err.message);
-    res.status(err.status || 500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message, stack: process.env.NODE_ENV === 'development' ? err.stack : undefined });
 });
 
 // Start the server
