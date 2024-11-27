@@ -151,7 +151,7 @@ function renderChart(results, sampleName) {
 // Function: Fetch and display last 5 samples
 async function fetchLastSamples() {
     try {
-        const response = await fetch('/last-samples');
+        const response = await fetch('/api/last-samples');
         const samples = await response.json();
 
         const sampleContainer = document.getElementById('sampleContainer');
