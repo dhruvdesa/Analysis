@@ -1,0 +1,36 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "api/**/*.js",
+        "use": "@vercel/node"
+      },
+      {
+        "src": "public/**/*",
+        "use": "@vercel/static"
+      },
+      {
+        "src": "index.html",
+        "use": "@vercel/static"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/get-enhanced-accuracy",
+        "dest": "/api/get-enhanced-accuracy.js"
+      },
+      {
+        "src": "/api/last-samples",
+        "dest": "/api/last-samples.js"
+      },
+      {
+        "src": "/api/upload",
+        "dest": "/api/upload.js"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/index.html"
+      }
+    ]
+  }
+  
