@@ -129,7 +129,7 @@ function calculateAccuracy(analysisResults) {
 }
 
 // Fetch last 5 samples from the database
-app.get('/last-samples', (req, res) => {
+app.get('/api/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
