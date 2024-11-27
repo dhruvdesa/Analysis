@@ -31,10 +31,12 @@ function updateAccuracyMeter(accuracy) {
 async function fetchInitialAccuracy() {
     try {
         const response = await fetch('/api/get-enhanced-accuracy');
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
         const data = await response.json();
         if (data.accuracy) updateAccuracyMeter(data.accuracy);
     } catch (error) {
-        console.error('Error fetching accuracy:', error);
+        console.error('Error fetching accuracy:', error.message);
+        accuracyPercentage.textContent = 'Error';
     }
 }
 
@@ -94,7 +96,7 @@ async function uploadImage() {
             alert(`Error: ${errorData.error || 'Image upload failed.'}`);
         }
     } catch (error) {
-        console.error('Error uploading image:', error);
+        console.error('Error uploading image:', error.message);
         alert('An error occurred while uploading the image.');
     } finally {
         loadingSpinner.style.display = 'none';
@@ -152,6 +154,7 @@ function renderChart(results, sampleName) {
 async function fetchLastSamples() {
     try {
         const response = await fetch('/api/last-samples');
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
         const samples = await response.json();
 
         const sampleContainer = document.getElementById('sampleContainer');
@@ -170,7 +173,7 @@ async function fetchLastSamples() {
             sampleContainer.appendChild(sampleElement);
         });
     } catch (error) {
-        console.error('Error fetching last samples:', error);
+        console.error('Error fetching last samples:', error.message);
     }
 }
 
