@@ -16,6 +16,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
+app.use(express.json()); // For handling JSON requests
 
 // MySQL connection using a connection pool
 const pool = mysql.createPool({
@@ -133,19 +134,35 @@ app.get('/api/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
-                 LIMIT 2`;  // Change to fetch last 5 samples
+                 LIMIT 5`;  // Fetch last 5 samples
 
     pool.query(sql, (error, results) => {
         if (error) {
-            console.error('Error fetching last 2 samples:', error.message);
+            console.error('Error fetching last samples:', error.message);
             return res.status(500).json({ error: 'Failed to fetch last samples from the database.' });
         }
         res.json(results); // Send the results as JSON
     });
 });
 
+// Fetch enhanced accuracy data
+app.get('/api/get-enhanced-accuracy', (req, res) => {
+    // Example logic for fetching enhanced accuracy from a stored model or database
+    const sql = `SELECT accuracy FROM accuracy_data ORDER BY date DESC LIMIT 1`; // Adjust to your database structure
+
+    pool.query(sql, (error, results) => {
+        if (error) {
+            console.error('Error fetching accuracy:', error.message);
+            return res.status(500).json({ error: 'Failed to fetch accuracy data.' });
+        }
+
+        const accuracy = results.length > 0 ? results[0].accuracy : 0;
+        res.json({ accuracy });
+    });
+});
+
 // Start the server
-app.listen(PORT,() => {
+app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`Server is running on http://${IP_ADDRESS}:${PORT}`);
 });
