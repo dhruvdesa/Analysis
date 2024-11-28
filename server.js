@@ -134,7 +134,7 @@ app.get('/api/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
-                 LIMIT 5`;  // Fetch last 5 samples
+                 LIMIT 2`;  // Fetch last 5 samples
 
     pool.query(sql, (error, results) => {
         if (error) {
