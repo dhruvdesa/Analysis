@@ -81,7 +81,7 @@ async function uploadImage() {
 
         previewImage(file);
 
-        const response = await fetch('/upload', {
+        const response = await fetch('/upload/', {
             method: 'POST',
             body: formData,
         });
