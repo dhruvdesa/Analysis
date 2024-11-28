@@ -70,7 +70,7 @@ app.get('/', (req, res) => {
 });
 
 // Handle image upload
-app.post('/upload/', upload.single('image'), async (req, res) => {
+app.post('/upload', upload.single('image'), async (req, res) => {
     const { sampleName } = req.body; // Get sample name from the form
 
     // Check if file and sampleName are provided
