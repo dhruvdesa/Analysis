@@ -30,7 +30,7 @@ function updateAccuracyMeter(accuracy) {
 // Helper function: Fetch and display initial accuracy
 async function fetchInitialAccuracy() {
     try {
-        const response = await fetch('/api/get-enhanced-accuracy');
+        const response = await fetch('/get-enhanced-accuracy');
         if (!response.ok) throw new Error(`API Error: ${response.status}`);
         const data = await response.json();
         if (data.accuracy) updateAccuracyMeter(data.accuracy);
@@ -81,7 +81,7 @@ async function uploadImage() {
 
         previewImage(file);
 
-        const response = await fetch('/upload/', {
+        const response = await fetch('/upload', {
             method: 'POST',
             body: formData,
         });
@@ -153,7 +153,7 @@ function renderChart(results, sampleName) {
 // Function: Fetch and display last 5 samples
 async function fetchLastSamples() {
     try {
-        const response = await fetch('/api/last-samples');
+        const response = await fetch('/last-samples');
         if (!response.ok) throw new Error(`API Error: ${response.status}`);
         const samples = await response.json();
 

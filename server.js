@@ -130,7 +130,7 @@ function calculateAccuracy(analysisResults) {
 }
 
 // Fetch last 5 samples from the database
-app.get('/api/last-samples', (req, res) => {
+app.get('/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
@@ -146,7 +146,7 @@ app.get('/api/last-samples', (req, res) => {
 });
 
 // Fetch enhanced accuracy data
-app.get('/api/get-enhanced-accuracy', (req, res) => {
+app.get('/get-enhanced-accuracy', (req, res) => {
     // Example logic for fetching enhanced accuracy from a stored model or database
     const sql = `SELECT accuracy FROM accuracy_data ORDER BY date DESC LIMIT 1`; // Adjust to your database structure
 
