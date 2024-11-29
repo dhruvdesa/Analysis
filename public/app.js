@@ -27,19 +27,6 @@ function updateAccuracyMeter(accuracy) {
     }
 }
 
-// Helper function: Fetch and display initial accuracy
-async function fetchInitialAccuracy() {
-    try {
-        const response = await fetch('/get-enhanced-accuracy');
-        if (!response.ok) throw new Error(`API Error: ${response.status}`);
-        const data = await response.json();
-        if (data.accuracy) updateAccuracyMeter(data.accuracy);
-    } catch (error) {
-        console.error('Error fetching accuracy:', error.message);
-        accuracyPercentage.textContent = 'Error';
-    }
-}
-
 // Function: Preview selected image
 function previewImage(file) {
     if (file instanceof File) {

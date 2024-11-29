@@ -145,22 +145,6 @@ app.get('/last-samples', (req, res) => {
     });
 });
 
-// Fetch enhanced accuracy data
-app.get('/get-enhanced-accuracy', (req, res) => {
-    // Example logic for fetching enhanced accuracy from a stored model or database
-    const sql = `SELECT accuracy FROM accuracy_data ORDER BY date DESC LIMIT 1`; // Adjust to your database structure
-
-    pool.query(sql, (error, results) => {
-        if (error) {
-            console.error('Error fetching accuracy:', error.message);
-            return res.status(500).json({ error: 'Failed to fetch accuracy data.' });
-        }
-
-        const accuracy = results.length > 0 ? results[0].accuracy : 0;
-        res.json({ accuracy });
-    });
-});
-
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
