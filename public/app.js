@@ -1,31 +1,13 @@
 // Global variables
 let analysisChart; // To hold the Chart.js instance
 let accuracyInterval; // Interval for fetching accuracy updates
-let previousAccuracy = 0; // Track previous accuracy for improvements
 
 // DOM elements
-const accuracyPercentage = document.getElementById('accuracy-percentage');
-const accuracyBar = document.getElementById('accuracy-bar');
 const fileInput = document.getElementById('fileInput');
 const cameraInput = document.getElementById('cameraInput');
 const sampleNameInput = document.getElementById('sampleName');
 const uploadButton = document.getElementById('uploadButton');
 const loadingSpinner = document.getElementById('loadingSpinner');
-
-// Helper function: Update accuracy meter
-function updateAccuracyMeter(accuracy) {
-    if (typeof accuracy === 'number' && accuracy >= 0 && accuracy <= 100) {
-        if (accuracy > previousAccuracy) {
-            accuracyPercentage.textContent = `${accuracy.toFixed(2)}%`;
-            accuracyBar.value = accuracy;
-            previousAccuracy = accuracy;
-        }
-    } else {
-        console.error('Invalid accuracy value:', accuracy);
-        accuracyPercentage.textContent = '0%';
-        accuracyBar.value = 0;
-    }
-}
 
 // Function: Preview selected image
 function previewImage(file) {
@@ -77,7 +59,6 @@ async function uploadImage() {
             const analysisResults = await response.json();
             updateAnalysisResults(analysisResults.results);
             renderChart(analysisResults.results, sampleName);
-            updateAccuracyMeter(parseFloat(analysisResults.accuracy));
         } else {
             const errorData = await response.json();
             alert(`Error: ${errorData.error || 'Image upload failed.'}`);

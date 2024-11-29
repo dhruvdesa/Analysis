@@ -113,7 +113,6 @@ app.post('/upload', upload.single('image'), async (req, res) => {
             res.json({
                 message: 'Analysis complete and data saved successfully.',
                 results: analysisResults,
-                accuracy: calculateAccuracy(analysisResults), // Example accuracy calculation
             });
         });
     } catch (error) {
@@ -121,13 +120,6 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         res.status(500).json({ error: 'Failed to analyze the image or save data.' });
     }
 });
-
-// Function to calculate accuracy (implement your own logic)
-function calculateAccuracy(analysisResults) {
-    // Dummy accuracy calculation based on some arbitrary logic
-    const accuracy = (100 - Math.abs(analysisResults.ffa)) / 100; // Just an example
-    return (accuracy * 100).toFixed(2) + '%'; // Return formatted accuracy
-}
 
 // Fetch last 2 samples from the database
 app.get('/last-samples', (req, res) => {
