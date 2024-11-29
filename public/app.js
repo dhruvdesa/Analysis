@@ -166,6 +166,5 @@ async function fetchLastSamples() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    fetchInitialAccuracy();
     fetchLastSamples();
 });
