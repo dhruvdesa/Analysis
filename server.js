@@ -129,12 +129,12 @@ function calculateAccuracy(analysisResults) {
     return (accuracy * 100).toFixed(2) + '%'; // Return formatted accuracy
 }
 
-// Fetch last 5 samples from the database
+// Fetch last 2 samples from the database
 app.get('/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
-                 LIMIT 2`;  // Fetch last 5 samples
+                 LIMIT 2`;  // Fetch last 2 samples
 
     pool.query(sql, (error, results) => {
         if (error) {
