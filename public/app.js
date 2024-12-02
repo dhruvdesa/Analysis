@@ -50,7 +50,7 @@ async function uploadImage() {
 
         previewImage(file);
 
-        const response = await fetch('/upload', {
+        const response = await fetch('/api/upload', {
             method: 'POST',
             body: formData,
         });
@@ -121,7 +121,7 @@ function renderChart(results, sampleName) {
 // Function: Fetch and display last 5 samples
 async function fetchLastSamples() {
     try {
-        const response = await fetch('/last-samples');
+        const response = await fetch('/api/last-samples');
         if (!response.ok) throw new Error(`API Error: ${response.status}`);
         const samples = await response.json();
 

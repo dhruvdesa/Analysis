@@ -70,7 +70,7 @@ app.get('/', (req, res) => {
 });
 
 // Handle image upload
-app.post('/upload', upload.single('image'), async (req, res) => {
+app.post('/api/upload', upload.single('image'), async (req, res) => {
     const { sampleName } = req.body; // Get sample name from the form
 
     // Check if file and sampleName are provided
@@ -122,7 +122,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 });
 
 // Fetch last 2 samples from the database
-app.get('/last-samples', (req, res) => {
+app.get('/api/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
