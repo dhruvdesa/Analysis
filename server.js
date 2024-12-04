@@ -138,7 +138,7 @@ app.get('/api/last-samples', (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
+app.listen(PORT, IP_ADDRESS,() => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`Server is running on http://${IP_ADDRESS}:${PORT}`);
 });
