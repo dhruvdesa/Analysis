@@ -4,19 +4,17 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const mysql = require('mysql2');
-const { analyzeImage } = require('./ml-model'); // Ensure this import path is correct
+const { analyzeImage } = require('./ml-model'); 
 
-const IP_ADDRESS = '192.168.1.226'; // Replace with your correct IP address
-
-// Set up Express app
+const IP_ADDRESS = '192.168.1.226';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.static('public'));
-app.use('/uploads', express.static('uploads')); // Serve uploaded files
-app.use(express.json()); // For handling JSON requests
+app.use('/uploads', express.static('uploads')); 
+app.use(express.json());
 
 // MySQL connection using a connection pool
 const pool = mysql.createPool({
@@ -24,92 +22,55 @@ const pool = mysql.createPool({
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || 'root19',
     database: process.env.DB_NAME || 'gnoc',
-    connectionLimit: 10, // Set the connection limit for the pool
-});
-
-// Connect to the database (for debugging)
-pool.getConnection((err) => {
-    if (err) {
-        console.error('Error connecting to the database:', err.message);
-    } else {
-        console.log('Connected to the MySQL database.');
-    }
+    connectionLimit: 10,
 });
 
 // Ensure the uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir);
-}
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadsDir); // Directory to save uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname); // Use original file name
-    },
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => cb(null, file.originalname),
 });
 
-// File filter for validating uploaded files
 const fileFilter = (req, file, cb) => {
     const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (acceptedFileTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error('Invalid file type. Only JPG, PNG, and GIF are allowed.'));
-    }
+    acceptedFileTypes.includes(file.mimetype) ? cb(null, true) : cb(new Error('Invalid file type.'));
 };
 
 const upload = multer({ storage, fileFilter });
 
 // Serve the main HTML page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-// Handle image upload
+// Handle image upload and analysis
 app.post('/api/upload', upload.single('image'), async (req, res) => {
-    const { sampleName } = req.body; // Get sample name from the form
-
-    // Check if file and sampleName are provided
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
-    }
-
-    if (!sampleName) {
-        return res.status(400).send('Sample name is required.');
+    if (!req.file || !req.body.sampleName) {
+        return res.status(400).send('Missing file or sample name.');
     }
 
     try {
-        // Analyze the uploaded image using the ML model
-        const analysisResults = await analyzeImage(req.file.path); // Correct path
+        const analysisResults = await analyzeImage(req.file.path);
 
-        // Log the analysis results for debugging
-        console.log('Analysis Results:', analysisResults);
-
-        // SQL query to insert the sample name and analysis results into the database
         const sql = `INSERT INTO scans (sample_name, image_name, oil, protein, ffa) 
                      VALUES (?, ?, ?, ?, ?)`;
 
         const values = [
-            sampleName, // Insert sample name
-            req.file.originalname, // Original file name
+            req.body.sampleName,
+            req.file.originalname,
             parseFloat(analysisResults.oil) || null,
             parseFloat(analysisResults.protein) || null,
             parseFloat(analysisResults.ffa) || null
         ];
 
-        // Use the connection pool to execute the query
-        pool.query(sql, values, (error, results) => {
+        pool.query(sql, values, (error) => {
             if (error) {
                 console.error('Database error:', error.message);
-                return res.status(500).json({ error: 'Failed to save data to the database.' });
+                return res.status(500).json({ error: 'Failed to save data.' });
             }
-            console.log('Data saved to the database.');
 
-            // Send back the analysis results along with a success message
             res.json({
                 message: 'Analysis complete and data saved successfully.',
                 results: analysisResults,
@@ -117,7 +78,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
         });
     } catch (error) {
         console.error('Error during analysis or saving data:', error.message);
-        res.status(500).json({ error: 'Failed to analyze the image or save data.' });
+        res.status(500).json({ error: 'Failed to analyze the image.' });
     }
 });
 
@@ -126,19 +87,19 @@ app.get('/api/last-samples', (req, res) => {
     const sql = `SELECT sample_name, oil, protein, ffa, upload_date 
                  FROM scans 
                  ORDER BY upload_date DESC 
-                 LIMIT 2`;  // Fetch last 2 samples
+                 LIMIT 2`;
 
     pool.query(sql, (error, results) => {
         if (error) {
             console.error('Error fetching last samples:', error.message);
-            return res.status(500).json({ error: 'Failed to fetch last samples from the database.' });
+            return res.status(500).json({ error: 'Failed to fetch samples.' });
         }
-        res.json(results); // Send the results as JSON
+        res.json(results);
     });
 });
 
 // Start the server
-app.listen(PORT, IP_ADDRESS,() => {
+app.listen(PORT, IP_ADDRESS, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`Server is running on http://${IP_ADDRESS}:${PORT}`);
 });
