@@ -11,6 +11,9 @@
         "source": "/api/(.*)",
         "destination": "/api/server.js"
       }
-    ]
-  }
+    ],
+    "functions": {
+        "api/*.js": { "memory": 512, "maxDuration": 30 }
+      }
+    }
   
