@@ -13,7 +13,7 @@
       }
     ],
     "functions": {
-        "api/*.js": { "memory": 512, "maxDuration": 30 }
+        "api/*.js": { "runtime": "nodejs18.x" }
       }
     }
   
