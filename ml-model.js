@@ -135,7 +135,7 @@ function calculateEnhancedAccuracy(manualData, scanData) {
 }
 
 // Auto-calibration if accuracy is below threshold
-const MIN_OVERALL_ACCURACY = 95;
+const MIN_OVERALL_ACCURACY = 97;
 
 async function checkAndAutoCalibrate() {
     try {
