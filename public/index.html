@@ -6,78 +6,123 @@
     <title>GN Oil Cake Analysis</title>
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
-    <!-- Include Font Awesome -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+    <!-- Container -->
     <div class="container">
+
+        <!-- Header Section -->
         <header class="header">
             <h1><i class="fas fa-vial"></i> GN Oil Cake Analysis</h1>
         </header>
 
+        <!-- Main Section -->
         <section class="main-section">
+
+            <!-- Left Panel -->
             <div class="left-panel">
+                <!-- Sample Input -->
                 <div class="sample-input">
-                    <label for="sampleName"><i class="fas fa-tag"></i> Sample Name:</label>
+                    <label for="sampleName">
+                        <i class="fas fa-tag"></i> Sample Name:
+                    </label>
                     <input type="text" id="sampleName" placeholder="Enter Sample Name" required>
                 </div>
+
+                <!-- Last Samples -->
                 <div class="last-samples">
                     <h2>Last 2 Sample Names</h2>
                     <div id="sampleContainer"></div>
-                </div>                
+                </div>
             </div>
 
+            <!-- Image Section -->
             <div class="image-section">
+                <!-- Upload Section -->
                 <div class="upload-section">
-                    <!-- File upload section with icons -->
+                    <!-- File Upload -->
                     <label for="fileInput" class="icon-button">
                         <i class="fas fa-file-upload"></i>
                     </label>
-                    <input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)" style="display: none;">
+                    <input type="file" id="fileInput" accept="image/*" 
+                        onchange="previewImage(event)" style="display: none;">
 
+                    <!-- Camera Upload -->
                     <label for="cameraInput" class="icon-button">
                         <i class="fas fa-camera"></i>
                     </label>
-                    <input type="file" accept="image/*" capture="environment" id="cameraInput" onchange="previewImage(event)" style="display: none;">
-                
+                    <input type="file" accept="image/*" capture="environment" 
+                        id="cameraInput" onchange="previewImage(event)" style="display: none;">
+
+                    <!-- Upload Button -->
                     <button id="uploadButton" class="choose-btn" onclick="uploadImage()">
                         <i class="fas fa-cloud-upload-alt"></i> Upload
                     </button>
                 </div>
 
+                <!-- Image Display -->
                 <div class="image-display">
                     <h2><i class="fas fa-image"></i> Uploaded Image</h2>
                     <img id="imagePreview" alt="Image Preview">
                 </div>
 
+                <!-- Loading Spinner -->
                 <div id="loadingSpinner" style="display: none;">
                     <i class="fas fa-spinner fa-spin"></i> Uploading...
                 </div>
             </div>
 
+            <!-- Right Panel -->
             <div class="right-panel">
+                <!-- Chart Container -->
                 <div class="chart-container">
                     <h3><i class="fas fa-chart-pie"></i> Analysis Chart</h3>
                     <canvas id="analysisChart"></canvas>
                 </div>
             </div>
+
         </section>
 
-        <div class="analysis-report">
-            <div class="analysis-details">
-                <h2><i class="fas fa-file-medical"></i> Analysis Report</h2>
-                <p><i class="fas fa-oil-can"></i> Oil: <span id="oil"></span></p>
-                <p><i class="fas fa-dumbbell"></i> Protein: <span id="protein"></span></p>
-                <p><i class="fas fa-flask"></i> FFA: <span id="ffa"></span></p>
+        <!-- Analysis Report Section -->
+        <section class="main-section">
+
+            <!-- Left Panel -->
+            <div class="left-panel">
+                <!-- Analysis Report -->
+                <div class="analysis-report">
+                    <div class="analysis-details">
+                        <h2><i class="fas fa-file-medical"></i> Analysis Report</h2>
+                        <p><i class="fas fa-oil-can"></i> Oil: <span id="oil"></span></p>
+                        <p><i class="fas fa-dumbbell"></i> Protein: <span id="protein"></span></p>
+                        <p><i class="fas fa-flask"></i> FFA: <span id="ffa"></span></p>
+                    </div>
+
+                    <!-- Download Section -->
+                    <div class="download-section">
+                        <button class="download-btn" onclick="downloadReport()">
+                            <i class="fas fa-file-download"></i> Download Report
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="download-section">
-                <button class="download-btn" onclick="downloadReport()">
-                    <i class="fas fa-file-download"></i> Download Report
-                </button>
-            </div>                
-        </div> 
+
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <!-- Accuracy Meter -->
+                <div id="accuracy-meter">
+                    <h3><i class="fas fa-tachometer-alt"></i> Model Accuracy</h3>
+                    <p>Overall Accuracy: <span id="overallAccuracy"></span>%</p>
+                    <p>Sample Accuracy: <span id="sampleAccuracy"></span>%</p>
+                </div>
+            </div>
+
+        </section>
+
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
 </body>

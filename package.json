@@ -17,7 +17,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
+    "dev": "nodemon app.js",
     "build": "npm run vercel-build"
   },
   "name": "gnoc",
