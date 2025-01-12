@@ -7,6 +7,7 @@ const mysql = require('mysql2');
 const { analyzeImage } = require('./ml-model'); 
 
 // const IP_ADDRESS = '192.168.1.226';
+const IP_ADDRESS = '192.168.127.57';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -99,7 +100,7 @@ app.get('/api/last-samples', (req, res) => {
 });
 
 // Start the server
-app.listen(PORT,  () => {
+app.listen(PORT, IP_ADDRESS, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-    // console.log(`Server is running on http://${IP_ADDRESS}:${PORT}`);
+    console.log(`Server is running on http://${IP_ADDRESS}:${PORT}`);
 });
