@@ -8,6 +8,8 @@ const cameraInput = document.getElementById('cameraInput');
 const sampleNameInput = document.getElementById('sampleName');
 const uploadButton = document.getElementById('uploadButton');
 const loadingSpinner = document.getElementById('loadingSpinner');
+const overallAccuracyElem = document.getElementById('overallAccuracy');
+const sampleAccuracyElem = document.getElementById('sampleAccuracy');
 
 // Function: Preview selected image
 function previewImage(file) {
@@ -118,6 +120,20 @@ function renderChart(results, sampleName) {
     });
 }
 
+// Function: Update accuracy meter
+async function updateAccuracyMeter() {
+    try {
+        const response = await fetch('/api/accuracy');
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        const { overallAccuracy, sampleAccuracy } = await response.json();
+
+        overallAccuracyElem.textContent = overallAccuracy.toFixed(2);
+        sampleAccuracyElem.textContent = sampleAccuracy.toFixed(2);
+    } catch (error) {
+        console.error('Error updating accuracy meter:', error.message);
+    }
+}
+
 // Function: Fetch and display last 5 samples
 async function fetchLastSamples() {
     try {
@@ -148,4 +164,6 @@ async function fetchLastSamples() {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     fetchLastSamples();
+    updateAccuracyMeter();
+    accuracyInterval = setInterval(updateAccuracyMeter, 5000); // Update every 5 seconds
 });
