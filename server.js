@@ -7,7 +7,7 @@ const mysql = require('mysql2');
 const { analyzeImage } = require('./ml-model'); 
 
 // const IP_ADDRESS = '192.168.1.226';
-const IP_ADDRESS = '192.168.42.57';
+const IP_ADDRESS = '192.168.168.57';
 const app = express();
 const PORT = process.env.PORT || 3000;
 

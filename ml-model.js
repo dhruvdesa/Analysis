@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 const { normalizeData, detectOutliers, advancedRecalibration } = require('./enhancedAccuracyUtils'); // Utility functions
 
 let model; // ML model
-const calibrationData = []; // Store historical calibration data
+let calibrationData = []; // Store historical calibration data
 
 // Database configuration
 const dbConfig = {
@@ -187,8 +187,12 @@ function logCalibrationData(errors, adjustedCoefficients) {
 
 // Save calibration data to file
 function saveCalibrationData() {
-    fs.writeFileSync('calibrationData.json', JSON.stringify(calibrationData, null, 2));
-    console.log('Calibration data saved.');
+    try {
+        fs.writeFileSync('model.json', JSON.stringify(calibrationData, null, 2));
+        console.log("Calibration data saved successfully.");
+    } catch (error) {
+        console.error("Failed to save calibration data:", error.message);
+    }
 }
 
 // Load calibration data at startup
